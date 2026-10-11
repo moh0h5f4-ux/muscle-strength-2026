@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b1220">
+<title>ميزانيتي | إدارة المصروفات</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121c2e;--panel2:#18243a;--line:#29364d;--text:#f4f7fb;--muted:#9aabc2;--green:#43d6a0;--red:#ff7785;--blue:#7c9cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#172844 0,var(--bg) 55%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1050px;margin:auto;padding:26px 16px 56px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px}.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#43d6a0,#5288ff);display:grid;place-items:center;font-size:25px;color:#071320}.brand h1{font-size:clamp(22px,4vw,30px);margin:0}.sub{color:var(--muted);font-size:13px;margin-top:4px}.actions{display:flex;gap:8px;flex-wrap:wrap}
+button,.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:10px 14px;font:inherit;cursor:pointer}button:hover{filter:brightness(1.13)}.primary{background:var(--green);color:#062016;border-color:transparent;font-weight:750}.danger{color:var(--red)}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}.card,.panel{background:rgba(18,28,46,.94);border:1px solid var(--line);border-radius:18px;padding:18px}.card .label{color:var(--muted);font-size:13px}.amount{font-size:clamp(21px,4vw,29px);font-weight:800;margin-top:10px;overflow-wrap:anywhere}.income{color:var(--green)}.expense{color:var(--red)}.balance{color:#a9bdff}.layout{display:grid;grid-template-columns: minmax(0, .9fr) minmax(0,1.5fr);gap:14px;align-items:start}.panel h2{font-size:18px;margin:0 0 16px}.field{margin-bottom:13px}.field label{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}.field input,.field select,.filters input,.filters select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#0b1424;color:var(--text);font:inherit;min-width:0}.types{display:grid;grid-template-columns:1fr 1fr;gap:8px}.types label{margin:0;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center;cursor:pointer;color:var(--text)}.types input{width:auto;accent-color:var(--green)}.formbtn{width:100%;margin-top:4px}.filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}.list{display:grid;gap:9px}.item{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:13px;padding:12px;min-width:0}.ico{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;background:var(--panel2);border-radius:12px;font-size:20px}.details{flex:1;min-width:0}.details strong{display:block;overflow-wrap:anywhere}.details small{display:block;color:var(--muted);margin-top:4px;font-size:12px}.right{display:flex;align-items:center;gap:9px}.money{font-weight:750;white-space:nowrap}.del{padding:7px 9px;background:transparent}.empty{text-align:center;color:var(--muted);padding:30px 10px}.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:20px;line-height:1.8}.notice{color:var(--muted);font-size:12px;line-height:1.6;margin-top:10px}
+@media(max-width:720px){.wrap{padding:18px 12px 40px}.cards{gap:8px}.card{padding:13px 11px}.card .label{font-size:12px}.layout{grid-template-columns:1fr}.panel{padding:15px}.actions button{padding:9px 10px}.item{padding:10px}.right{gap:5px}.money{font-size:13px}.del{padding:7px}}
+@media(max-width:380px){.cards{grid-template-columns:1fr}.amount{font-size:24px}.filters{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header class="top"><div class="brand"><div class="logo">د</div><div><h1>ميزانيتي</h1><div class="sub">تابع دخلك ومصروفاتك ببساطة</div></div></div><div class="actions"><button id="exportBtn">تصدير CSV</button><button id="clearBtn" class="danger">مسح البيانات</button></div></header>
+<section class="cards" aria-label="ملخص الميزانية">
+<div class="card"><div class="label">الرصيد الحالي</div><div class="amount balance" id="balance">0.00 د.ل</div></div>
+<div class="card"><div class="label">إجمالي الدخل</div><div class="amount income" id="income">0.00 د.ل</div></div>
+<div class="card"><div class="label">إجمالي المصروفات</div><div class="amount expense" id="expense">0.00 د.ل</div></div>
+</section>
+<div class="layout">
+<section class="panel"><h2>＋ إضافة حركة مالية</h2><form id="entryForm">
+<div class="field"><label>نوع الحركة</label><div class="types"><label><input type="radio" name="type" value="expense" checked> مصروف</label><label><input type="radio" name="type" value="income"> دخل</label></div></div>
+<div class="field"><label for="title">البيان</label><input id="title" required maxlength="100" placeholder="مثال: مشتريات المنزل"></div>
+<div class="field"><label for="amount">المبلغ (دينار ليبي)</label><input id="amount" type="number" min="0.01" max="999999999" step="0.01" required placeholder="0.00"></div>
+<div class="field"><label for="category">التصنيف</label><select id="category"><option>طعام ومشروبات</option><option>منزل وفواتير</option><option>مواصلات</option><option>صحة</option><option>تسوق</option><option>تعليم</option><option>ترفيه</option><option>راتب</option><option>عمل</option><option>هدايا</option><option>أخرى</option></select></div>
+<div class="field"><label for="date">التاريخ</label><input id="date" type="date" required></div>
+<button class="primary formbtn" type="submit">حفظ الحركة</button></form><p class="notice">بياناتك محفوظة في هذا المتصفح على جهازك. لا تُرسل إلى خادم. امسح بيانات المتصفح قد يؤدي إلى فقدانها؛ صدّر نسخة احتياطية بانتظام.</p></section>
+<section class="panel"><h2>سجل الحركات</h2><div class="filters"><input id="search" type="search" placeholder="ابحث في الحركات…" aria-label="البحث"><select id="filter"><option value="all">كل الحركات</option><option value="expense">المصروفات فقط</option><option value="income">الدخل فقط</option></select></div><div id="entries" class="list"></div></section>
+</div>
+<div class="foot">ميزانيتي · تطبيق مجاني لإدارة ميزانيتك الشخصية<br>تذكير: الأرقام تعتمد على الحركات التي تسجلها بنفسك.</div>
+</main>
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const KEY='mizan_expenses_v1';
+let entries=[];
+try{const saved=localStorage.getItem(KEY);entries=saved?JSON.parse(saved):[];if(!Array.isArray(entries))entries=[];}catch(e){entries=[];}
+const today=new Date();$('date').value=[today.getFullYear(),String(today.getMonth()+1).padStart(2,'0'),String(today.getDate()).padStart(2,'0')].join('-');
+const money=n=>new Intl.NumberFormat('ar-LY',{style:'currency',currency:'LYD',maximumFractionDigits:2}).format(n);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(entries));}catch(e){alert('تعذر حفظ البيانات. قد تكون مساحة المتصفح ممتلئة. صدّر نسخة من بياناتك.');}}
+function render(){
+const inc=entries.filter(x=>x.type==='income').reduce((s,x)=>s+x.amount,0), exp=entries.filter(x=>x.type==='expense').reduce((s,x)=>s+x.amount,0);
+$('income').textContent=money(inc);$('expense').textContent=money(exp);$('balance').textContent=money(inc-exp);
+const q=$('search').value.trim().toLocaleLowerCase('ar'), f=$('filter').value;
+const filtered=entries.filter(x=>(f==='all'||x.type===f)&&(!q||(x.title+' '+x.category+' '+x.date).toLocaleLowerCase('ar').includes(q))).sort((a,b)=>b.date.localeCompare(a.date)||b.created-a.created);
+if(!filtered.length){$('entries').innerHTML='<div class="empty">لا توجد حركات بعد.<br>أضف أول حركة مالية من النموذج.</div>';return;}
+$('entries').innerHTML=filtered.map(x=>'<article class="item"><div class="ico">'+(x.type==='income'?'↙️':'↗️')+'</div><div class="details"><strong>'+esc(x.title)+'</strong><small>'+esc(x.category)+' · '+esc(x.date)+'</small></div><div class="right"><span class="money '+(x.type==='income'?'income':'expense')+'">'+(x.type==='income'?'+':'−')+money(x.amount)+'</span><button class="del" data-delete="'+esc(x.id)+'" aria-label="حذف '+esc(x.title)+'" title="حذف">×</button></div></article>').join('');
+}
+$('entryForm').addEventListener('submit',e=>{e.preventDefault();const title=$('title').value.trim(),amount=Number($('amount').value),date=$('date').value;if(!title||!Number.isFinite(amount)||amount<=0||!date){alert('يرجى إدخال البيان والمبلغ والتاريخ بشكل صحيح.');return;}entries.push({id:String(Date.now())+'-'+Math.random().toString(36).slice(2,8),type:document.querySelector('input[name="type"]:checked').value,title,amount,category:$('category').value,date,created:Date.now()});save();$('title').value='';$('amount').value='';render();});
+$('entries').addEventListener('click',e=>{const b=e.target.closest('[data-delete]');if(!b)return;const x=entries.find(v=>v.id===b.dataset.delete);if(x&&confirm('هل تريد حذف الحركة «'+x.title+'»؟')){entries=entries.filter(v=>v.id!==x.id);save();render();}});
+$('search').addEventListener('input',render);$('filter').addEventListener('change',render);
+$('clearBtn').addEventListener('click',()=>{if(entries.length&&confirm('هل أنت متأكد؟ سيتم حذف جميع الحركات المحفوظة على هذا الجهاز.')){entries=[];save();render();}});
+$('exportBtn').addEventListener('click',()=>{if(!entries.length){alert('لا توجد بيانات لتصديرها.');return;}const rows=[['النوع','البيان','المبلغ بالدينار الليبي','التصنيف','التاريخ'],...entries.map(x=>[x.type==='income'?'دخل':'مصروف',x.title,x.amount,x.category,x.date])];const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));const a=document.createElement('a');a.href=url;a.download='mizanati-'+$('date').value+'.csv';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);});
+render();
+})();
+</script>
+</body></html>
